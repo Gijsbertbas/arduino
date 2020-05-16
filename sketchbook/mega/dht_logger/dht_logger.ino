@@ -16,7 +16,7 @@ current version: 0.7.0
 #include <Wire.h>
 #include <RTClib.h>
 #include <SPI.h>
-#include <SD.h>
+#include <SDM.h>
 #include <Http.h>
 #include <Sim800.h>
 
@@ -35,8 +35,8 @@ const int simPin =  45;
 unsigned int RX_PIN = 52;
 unsigned int TX_PIN = 53;
 unsigned int RST_PIN = 12;
-const bool DEBUG = false;
-HTTP http(9600, RX_PIN, TX_PIN, RST_PIN, DEBUG); 
+const char BEARER[] PROGMEM = "internet";
+HTTP http(9600, RX_PIN, TX_PIN, RST_PIN); 
 
 RTC_DS1307 rtc;
 File logFile;
@@ -76,9 +76,8 @@ void resetRTC() {
   digitalWrite(simPin, HIGH);
   delay(5000); // enough time to find network?
 
-  http.configureBearer("internet");
   Serial.println("trying to setup an internet connection");
-  http.connect();
+  http.connect(BEARER);
   
   Serial.println("Calling function to get location and time...");
   char response[128];
@@ -170,8 +169,7 @@ void postReading() {
   delay(2000);
   Serial.println(body);
 
-  http.configureBearer("internet");
-  http.connect();
+  http.connect(BEARER);
 
   // to allow the connection to fully establish, may not be needed:
   delay(1000); 
@@ -214,9 +212,9 @@ void setup() {
   }
 
   resetRTC();
-  
+
   // THE NEXT LINE HAS CHANGED FOR THE MEGA
-  if (!SD.begin(10, 11,12,13)) { 
+  if (!SD.begin(10, 11, 12, 13)) { 
     Serial.println("initialization failed!");
     while (1);
   }
