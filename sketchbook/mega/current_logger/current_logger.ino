@@ -105,7 +105,7 @@ void readCurrent() {
 
   if (isnan(sensorValue)) {
     int count = 0;
-    while (isnan(sensorValue)) && count < 10) {
+    while (isnan(sensorValue) && count < 10) {
       delay(500);
       sensorValue = corf * analogRead(sensorPin);
       count += 1;
@@ -143,7 +143,7 @@ void writeOut(DateTime now) {
   logFile.print("\"");
   logFile.print(datetime);
   logFile.print("\" ");
-  logFile.print(fcur);
+  logFile.println(fcur);
   logFile.close();
 }
 
@@ -188,8 +188,7 @@ void postReading() {
  */
 
 void setup() {
-  dht.begin();
-
+  
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
   while (!Serial) {
@@ -246,7 +245,7 @@ void loop() {
 
       Serial.print(datetime);
       Serial.print(" - Current (A): ");
-      Serial.print(fcur);
+      Serial.println(fcur);
 
       writeOut(now);
 
