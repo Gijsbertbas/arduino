@@ -8,6 +8,9 @@ This project started with an [Arduino Uno](https://store.arduino.cc/arduino-uno-
 
 Samples are posted to a Django app hosted at Pythonanywhere where they are visualised in an interactive Bokeh plot, see [here an example](http://gbstraathof.pythonanywhere.com/arduino/apilog/dhtlogger01) for one of the loggers.
 
+## Current logger
+Logging currents using a ... sensor. Similar to the DHT logger the values are saved to SD and posted to a API endpoint. The script for the Mega can be found [here](./sketchbook/meat/current_logger).
+
 ## Hardware setup
 Description of our hardware setup is pending...
 
@@ -18,7 +21,7 @@ For the SIM800 module we use the excellent module by [Antonio Carrasco](https://
 
 ----
 
-The plotting folder contains some (test) scripts used for generating the website figures. The at_commands folder contains some documentation on AT commands for the SIM800.
+The plotting folder contains some (test) scripts used for generating the website figures. The at_commands folder contains documentation on AT commands for the SIM800.
 
 Don't hesitate to get in touch!
 
