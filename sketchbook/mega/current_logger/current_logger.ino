@@ -1,5 +1,6 @@
 /*
- verion 0.0.1 - 23 05 2020
+ version 0.0.1 - 23 05 2020
+ version 0.0.2 - 24 05 2020
  */
 #include <Wire.h>
 #include <RTClib.h>
@@ -8,7 +9,7 @@
 #include <Http.h>
 #include <Sim800.h>
 
-// DHT
+// Sensor
 int sensorPin = A0;
 float sensorValue = 0.0;
 int YDHC = 1; //30A sensor
@@ -17,6 +18,7 @@ int YDHC = 1; //30A sensor
 float corf = 0.026; // correction factor
 float calf = 1.0; // callibration factor
 float fcur = 0.0; // final result
+char scur[6]; // string respresentation of result
 
 // SIM800
 #define POSTENDPOINT "http://gbstraathof.pythonanywhere.com/arduino/api/current/?format=json&username=***&api_key=***"
@@ -36,7 +38,12 @@ File logFile;
 char fout[] = "yyyymmdd.log"; // filename max 8 char, ext max 3
 
 int tsec, tsecprev, smod, tmin, tminprev, mmod;
-char datetime[] = "yy-mm-dd hh:mm:ss";
+char datetime[] = "yyyy-mm-dd hh:mm:ss";
+char logstring[28];
+
+// Sampling intervals
+int logint = 30; // logging interval (seconds)
+int postint = 10; // posting interval (minutes)
 
 /*
  * functions
@@ -120,7 +127,7 @@ void setFilename(DateTime now) {
   if (SD.exists(fout)) {
   } else{
     logFile = SD.open(fout, FILE_WRITE);
-    logFile.println("timestamp temperature humidity");
+    logFile.println("timestamp current");
     logFile.close();
     if (SD.exists(fout)) {
       Serial.print(fout);
@@ -139,11 +146,12 @@ void writeOut(DateTime now) {
 
   setFilename(now);
 
+  dtostrf(fcur, 4, 2, scur);
+
+  sprintf(logstring, "\"%s\" %s", datetime, scur);
+
   logFile = SD.open(fout, FILE_WRITE);
-  logFile.print("\"");
-  logFile.print(datetime);
-  logFile.print("\" ");
-  logFile.println(fcur);
+  logFile.println(logstring);
   logFile.close();
 }
 
@@ -151,7 +159,6 @@ void postReading() {
 
   digitalWrite(simPin, HIGH);
 
-  char scur[6];
   dtostrf(fcur, 4, 2, scur);
 
   char body[29];
@@ -166,7 +173,6 @@ void postReading() {
 
   char response[256];
   Result result;
-  //result = http.get(GETENDPOINT, response);
   result = http.post(POSTENDPOINT, body, response);
 
   if (result == SUCCESS) {
@@ -188,7 +194,7 @@ void postReading() {
  */
 
 void setup() {
-  
+
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
   while (!Serial) {
@@ -228,7 +234,7 @@ void setup() {
  */
 
 void loop() {
-  // put your main code here, to run repeatedly
+
   DateTime now = rtc.now();
 
   tsec = now.second();
@@ -236,7 +242,7 @@ void loop() {
   while ( tsec != tsecprev) {
 
     tsecprev = tsec;
-    smod = tsec % 30 ;
+    smod = tsec % logint ;
 
     if ( smod == 0 ){
 
@@ -249,22 +255,24 @@ void loop() {
 
       writeOut(now);
 
-      // Every 10 minutes a sample will be posted
-      tmin = now.minute();
-      while ( tmin != tminprev) {
-
-        tminprev = tmin;
-        mmod = tmin % 10 ;
-
-        if ( mmod == 0 ){
-          Serial.println("a sample will be sent to the server... ");
-
-          postReading();
-
-        }
-      }
     }
   }
+
+  // Every 'postint' minutes a sample will be posted
+  tmin = now.minute();
+  while ( tmin != tminprev) {
+
+    tminprev = tmin;
+    mmod = tmin % postint ;
+
+    if ( mmod == 0 ){
+      Serial.println("a sample will be sent to the server... ");
+
+      postReading();
+
+    }
+  }
+
   // Wait 0.5 s before testing for the next 30 second interval
   delay(500);
 }
