@@ -9,7 +9,7 @@ This project started with an [Arduino Uno](https://store.arduino.cc/arduino-uno-
 Samples are posted to a Django app hosted at Pythonanywhere where they are visualised in an interactive Bokeh plot, see [here an example](http://gbstraathof.pythonanywhere.com/arduino/apilog/dhtlogger01) for one of the loggers.
 
 ## Current logger
-Logging currents using a ... sensor. Similar to the DHT logger the values are saved to SD and posted to a API endpoint. The script for the Mega can be found [here](./sketchbook/meat/current_logger).
+Logging currents using a ... sensor. Similar to the DHT logger the values are saved to SD and posted to a API endpoint. The script for the Mega can be found [here](./sketchbook/mega/current_logger).
 
 ## Hardware setup
 Description of our hardware setup is pending...
