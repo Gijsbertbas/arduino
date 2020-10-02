@@ -23,7 +23,7 @@ float fcur = 0.0; // final result
 char scur[6]; // string respresentation of result
 
 // SIM800
-#define POSTENDPOINT "http://gbstraathof.pythonanywhere.com/arduino/api/current/?format=json&username=testuser&api_key=testkey"
+#define POSTENDPOINT "http://gbstraathof.pythonanywhere.com/arduino/api/current/?format=json&username=***&api_key=***"
 #define BODY_FORMAT "{\"current\": %s}"
 char *dtostrf(double val, signed char width, unsigned char prec, char *s);
 
@@ -48,8 +48,7 @@ int logint = 30; // logging interval (seconds)
 int postint = 2; // posting interval (minutes)
 
 // Dusk2Dawn
-Dusk2Dawn ulv(51.542372, 4.829748, 1);
-bool DST;
+Dusk2Dawn ulv(51.542372, 4.829748, 0); // rtc is using network time which is gmt
 
 /*
  * setup
@@ -130,7 +129,9 @@ void loop() {
     tminprev = tmin;
     mmod = tmin % postint ;
 
-    if ( mmod == 0 && isDaytime(now, ulv, DST, 30)){
+    // 3rd parameter is DST: since the RTC is GMT this should for now be set to false
+    // DST can be determined by using 'isDST(now)'
+    if ( mmod == 0 && isDaytime(now, ulv, false, 30)){
       Serial.println("a sample will be sent to the server... ");
 
       postReading();
